@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои задачи — Task Manager</title>
+</head>
+<body>
+    <h1>Мои задачи</h1>
+
+    <p>Привет, {{ current_user.username }}!</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <p>{{ form.title.label }}<br>{{ form.title() }}</p>
+        <p>{{ form.description.label }}<br>{{ form.description() }}</p>
+        <p>{{ form.status.label }}<br>{{ form.status() }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+    <hr>
+
+    <h2>Поиск и фильтрация</h2>
+
+    <form method="GET">
+        <p>
+            <label for="search">Поиск по названию или описанию</label><br>
+            <input type="text" id="search" name="search" value="{{ search }}">
+        </p>
+
+        <p>
+            <label for="status">Статус</label><br>
+            <select id="status" name="status">
+                <option value="">Все задачи</option>
+                {% for value in ["Новая", "В работе", "Завершена"] %}
+                    <option value="{{ value }}"
+                        {% if selected_status == value %}selected{% endif %}>
+                        {{ value }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <button type="submit">Найти</button>
+        <a href="{{ url_for('tasks') }}">Сбросить</a>
+    </form>
+
+    <hr>
+
+    <h2>Список задач</h2>
+
+    {% if tasks %}
+        {% for task in tasks %}
+            <article>
+                <h3>{{ task.title }}</h3>
+                <p>{{ task.description or "Без описания" }}</p>
+                <p>Статус: {{ task.status }}</p>
+                <p>Создана: {{ task.created_at.strftime("%d.%m.%Y %H:%M") }}</p>
+                <p>
+    <a href="{{ url_for('edit_task', task_id=task.id) }}">Редактировать</a>
+</p>
+
+<form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}">
+    {{ form.csrf_token }}
+    <button type="submit"
+            onclick="return confirm('Удалить эту задачу?')">
+        Удалить
+    </button>
+</form>
+            </article>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>Задач пока нет.</p>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('logout') }}">
+        {{ form.csrf_token }}
+        <button type="submit">Выйти из аккаунта</button>
+    </form>
+</body>
+</html>
