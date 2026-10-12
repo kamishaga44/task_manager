@@ -32,6 +32,9 @@ task_manager/
 ├── test_app.py
 ├── requirements.txt
 ├── README.md
+├── static/
+│   └── css/
+│       └── style.css
 └── templates/
     ├── login.html
     ├── register.html
@@ -41,8 +44,20 @@ task_manager/
 
 ## Installation and Setup
 
-1. Clone the repository.
-2. Create and activate a virtual environment.
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/kamishaga44/task_manager.git
+   cd task_manager
+   ```
+
+2. Create and activate a virtual environment:
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
 3. Install the dependencies:
 
    ```bash
@@ -71,6 +86,7 @@ pytest -v
 - Login is required to access personal tasks.
 - Users cannot edit or delete tasks belonging to other users.
 - Forms use CSRF protection.
+- Input validation is applied to user-submitted data.
 
 ## Purpose
 

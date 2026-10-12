@@ -364,3 +364,30 @@ def test_user_cannot_login_with_wrong_password(client):
 
     with test_client.session_transaction() as session:
         assert "_user_id" not in session
+
+
+
+
+def test_login_rejects_request_without_csrf_token():
+    original_csrf = app.config["WTF_CSRF_ENABLED"]
+    original_testing = app.config["TESTING"]
+
+    try:
+        app.config["WTF_CSRF_ENABLED"] = True
+        app.config["TESTING"] = False
+
+        with app.test_client() as test_client:
+            response = test_client.post(
+                "/login",
+                data={
+                    "email": "test@example.com",
+                    "password": "testpassword123",
+                    "submit": "Войти",
+                },
+            )
+
+        assert response.status_code == 400
+
+    finally:
+        app.config["WTF_CSRF_ENABLED"] = original_csrf
+        app.config["TESTING"] = original_testing
