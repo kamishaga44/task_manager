@@ -188,22 +188,6 @@ def logout():
     return redirect(url_for("login"))
 
 
-def create_own_task():
-    user = db.session.execute(
-        db.select(User).where(User.username == "testuser")
-    ).scalar_one()
-
-    task = Task(
-        title="Моя тестовая задача",
-        description="Исходное описание",
-        status="Новая",
-        user_id=user.id,
-    )
-    db.session.add(task)
-    db.session.commit()
-
-    return task.id
-
 @app.route("/tasks", methods=["GET", "POST"])
 @login_required
 def tasks():
