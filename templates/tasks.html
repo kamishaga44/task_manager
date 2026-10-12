@@ -4,86 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои задачи — Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Мои задачи</h1>
+    <main class="container">
+        <header class="topbar">
+            <div>
+                <h1>мои задачи ♡</h1>
+                <p class="subtitle">привет, {{ current_user.username }}! всё по силам, шаг за шагом.</p>
+            </div>
 
-    <p>Привет, {{ current_user.username }}!</p>
+            <form method="POST" action="{{ url_for('logout') }}">
+                {{ form.csrf_token }}
+                <button type="submit" class="button-secondary">выйти</button>
+            </form>
+        </header>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <p class="flash {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+        <section class="card">
+            <h2>новая задача</h2>
+            <p class="subtitle">запишите то, что хотите сделать</p>
 
-        <p>{{ form.title.label }}<br>{{ form.title() }}</p>
-        <p>{{ form.description.label }}<br>{{ form.description() }}</p>
-        <p>{{ form.status.label }}<br>{{ form.status() }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-    <hr>
+                <div class="form-group">
+                    {{ form.title.label }}
+                    {{ form.title(placeholder="например, подготовить резюме") }}
+                    {% for error in form.title.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-    <h2>Поиск и фильтрация</h2>
+                <div class="form-group">
+                    {{ form.description.label }}
+                    {{ form.description(placeholder="добавьте детали, если нужно") }}
+                    {% for error in form.description.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-    <form method="GET">
-        <p>
-            <label for="search">Поиск по названию или описанию</label><br>
-            <input type="text" id="search" name="search" value="{{ search }}">
-        </p>
+                <div class="form-group">
+                    {{ form.status.label }}
+                    {{ form.status() }}
+                    {% for error in form.status.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-        <p>
-            <label for="status">Статус</label><br>
-            <select id="status" name="status">
-                <option value="">Все задачи</option>
-                {% for value in ["Новая", "В работе", "Завершена"] %}
-                    <option value="{{ value }}"
-                        {% if selected_status == value %}selected{% endif %}>
-                        {{ value }}
-                    </option>
-                {% endfor %}
-            </select>
-        </p>
+                {{ form.submit(class="button") }}
+            </form>
+        </section>
 
-        <button type="submit">Найти</button>
-        <a href="{{ url_for('tasks') }}">Сбросить</a>
-    </form>
+        <section class="card">
+            <h2>найти задачу</h2>
 
-    <hr>
+            <form method="GET">
+                <div class="form-group">
+                    <label for="search">Название или описание</label>
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="что ищем?"
+                    >
+                </div>
 
-    <h2>Список задач</h2>
+                <div class="form-group">
+                    <label for="status">Статус</label>
+                    <select id="status" name="status">
+                        <option value="">Все задачи</option>
+                        {% for value in ["Новая", "В работе", "Завершена"] %}
+                            <option value="{{ value }}"
+                                {% if selected_status == value %}selected{% endif %}>
+                                {{ value }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-    {% if tasks %}
-        {% for task in tasks %}
-            <article>
-                <h3>{{ task.title }}</h3>
-                <p>{{ task.description or "Без описания" }}</p>
-                <p>Статус: {{ task.status }}</p>
-                <p>Создана: {{ task.created_at.strftime("%d.%m.%Y %H:%M") }}</p>
-                <p>
-    <a href="{{ url_for('edit_task', task_id=task.id) }}">Редактировать</a>
-</p>
+                <div class="actions">
+                    <button type="submit">найти</button>
+                    <a class="button button-secondary" href="{{ url_for('tasks') }}">сбросить</a>
+                </div>
+            </form>
+        </section>
 
-<form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}">
-    {{ form.csrf_token }}
-    <button type="submit"
-            onclick="return confirm('Удалить эту задачу?')">
-        Удалить
-    </button>
-</form>
-            </article>
-            <hr>
-        {% endfor %}
-    {% else %}
-        <p>Задач пока нет.</p>
-    {% endif %}
+        <section>
+            <h2>список задач</h2>
 
-    <form method="POST" action="{{ url_for('logout') }}">
-        {{ form.csrf_token }}
-        <button type="submit">Выйти из аккаунта</button>
-    </form>
+            {% if tasks %}
+                <div class="task-list">
+                    {% for task in tasks %}
+                        <article class="task-card">
+                            <h3>{{ task.title }}</h3>
+
+                            <p class="task-description">
+                                {{ task.description or "без описания" }}
+                            </p>
+
+                            <p>
+                                <span class="status
+                                    {% if task.status == 'В работе' %}status-work
+                                    {% elif task.status == 'Завершена' %}status-done
+                                    {% endif %}">
+                                    {{ task.status }}
+                                </span>
+                            </p>
+
+                            <p class="task-meta">
+                                создана: {{ task.created_at.strftime("%d.%m.%Y %H:%M") }}
+                            </p>
+
+                            <div class="actions">
+                                <a
+                                    class="button button-secondary"
+                                    href="{{ url_for('edit_task', task_id=task.id) }}"
+                                >редактировать</a>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('delete_task', task_id=task.id) }}"
+                                    onsubmit="return confirm('удалить эту задачу?')"
+                                >
+                                    {{ form.csrf_token }}
+                                    <button type="submit" class="button-danger">удалить</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>пока здесь тихо ♡</h3>
+                    <p>добавьте первую задачу или измените параметры поиска.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>

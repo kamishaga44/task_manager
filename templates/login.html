@@ -4,24 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход — Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Вход в аккаунт</h1>
+    <main class="container auth-container">
+        <section class="card">
+            <h1>с возвращением ♡</h1>
+            <p class="subtitle">войдите, чтобы продолжить работу со своими задачами</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="flash {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-        <p>{{ form.email.label }}<br>{{ form.email() }}</p>
-        <p>{{ form.password.label }}<br>{{ form.password() }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(placeholder="you@example.com", autocomplete="email") }}
+                    {% for error in form.email.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-    <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(placeholder="введите пароль", autocomplete="current-password") }}
+                    {% for error in form.password.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <p>{{ form.submit(class="button") }}</p>
+            </form>
+
+            <hr>
+
+            <p>еще нет аккаунта?</p>
+            <a href="{{ url_for('register') }}">создать аккаунт</a>
+        </section>
+    </main>
 </body>
 </html>

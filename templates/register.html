@@ -4,26 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация — Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Регистрация</h1>
+    <main class="container auth-container">
+        <section class="card">
+            <h1>создадим аккаунт ♡</h1>
+            <p class="subtitle">ваше пространство для планов и маленьких побед</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="flash {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-        <p>{{ form.username.label }}<br>{{ form.username() }}</p>
-        <p>{{ form.email.label }}<br>{{ form.email() }}</p>
-        <p>{{ form.password.label }}<br>{{ form.password() }}</p>
-        <p>{{ form.confirm_password.label }}<br>{{ form.confirm_password() }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+                <div class="form-group">
+                    {{ form.username.label }}
+                    {{ form.username(placeholder="как к вам обращаться", autocomplete="username") }}
+                    {% for error in form.username.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-    <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(placeholder="you@example.com", autocomplete="email") }}
+                    {% for error in form.email.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(placeholder="не менее 8 символов", autocomplete="new-password") }}
+                    {% for error in form.password.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.confirm_password.label }}
+                    {{ form.confirm_password(placeholder="повторите пароль", autocomplete="new-password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <p>{{ form.submit(class="button") }}</p>
+            </form>
+
+            <hr>
+
+            <p>уже есть аккаунт?</p>
+            <a href="{{ url_for('login') }}">войти</a>
+        </section>
+    </main>
 </body>
 </html>

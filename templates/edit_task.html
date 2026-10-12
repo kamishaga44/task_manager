@@ -4,25 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактирование задачи — Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Редактирование задачи</h1>
+    <main class="container auth-container">
+        <section class="card">
+            <h1>изменим планы ♡</h1>
+            <p class="subtitle">задачу всегда можно уточнить или перенести</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="flash {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
 
-    <form method="POST">
-        {{ form.hidden_tag() }}
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-        <p>{{ form.title.label }}<br>{{ form.title() }}</p>
-        <p>{{ form.description.label }}<br>{{ form.description() }}</p>
-        <p>{{ form.status.label }}<br>{{ form.status() }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+                <div class="form-group">
+                    {{ form.title.label }}
+                    {{ form.title() }}
+                    {% for error in form.title.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
 
-    <p><a href="{{ url_for('tasks') }}">Вернуться к задачам</a></p>
+                <div class="form-group">
+                    {{ form.description.label }}
+                    {{ form.description() }}
+                    {% for error in form.description.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.status.label }}
+                    {{ form.status() }}
+                    {% for error in form.status.errors %}
+                        <p class="flash error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="actions">
+                    {{ form.submit(class="button") }}
+                    <a class="button button-secondary" href="{{ url_for('tasks') }}">
+                        назад к задачам
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
